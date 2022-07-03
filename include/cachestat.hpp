@@ -5,8 +5,14 @@
 #include <string>
 
 #include "cachestat.skel.h"
+#include "bcc.hpp"
 
 using namespace std;
+
+
+struct cachestate_option_t {
+    bool show_time;
+};
 
 struct key_u_t {
     unsigned long long ip;
@@ -14,13 +20,12 @@ struct key_u_t {
 
 void cachestate_controller_run(void);
 
-class CacheState
+class CacheStateController: public Controller
 {
 public:
-    CacheState();
+    CacheStateController(struct cachestate_option_t opt);
     void Run();
-    void Stop();
-    ~CacheState();
+    ~CacheStateController();
 
 private:
     // get mem infor
@@ -28,12 +33,12 @@ private:
 
 
 private:
+    struct cachestate_option_t _opt;
     struct skel_cachestat *_skel;
-
     map<unsigned long long, string> _ksym_maps;
-
-
     int _map_fd;
 };
+
+
 
 #endif

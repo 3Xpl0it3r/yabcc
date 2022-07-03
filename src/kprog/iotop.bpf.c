@@ -83,17 +83,18 @@ KPROBE_BPF_PROG(blk_mq_start_request)(struct pt_regs *reg)
     struct request *req = (struct request *)PT_REGS_PARM1(reg);
     if (req == NULL)  
         return 0;
-    struct startup_t startup = {};
-    __builtin_memset(&startup, 0, sizeof(startup));
+    struct startup_t startup = {
+        .ts = bpf_ktime_get_ns(),
+        .data_len = 0,
+    };
 
-    startup.ts = bpf_ktime_get_ns();
-    
 
     if (LINUX_KERNEL_VERSION >= KERNEL_VERSION(4, 18, 0)) {
         startup.data_len = BPF_CORE_READ(req, __data_len);
     } else {
         bpf_probe_read_kernel(&startup.data_len, sizeof(req->__data_len), __builtin_preserve_access_index(&req->__data_len));
     }
+    bpf_printk("debug len %llu ", startup.data_len);
     bpf_map_update_elem(&startup_req_map, &req, &startup, BPF_ANY);
 
     return 0;
@@ -170,10 +171,9 @@ KPROBE_BPF_PROG(blk_account_io_done)(struct pt_regs *reg)
     val_p = bpf_map_lookup_elem(&summary_map, &info);
 
     if (val_p) {
-        __u64 bytes = 0;
-        val_p->bytes += start_p->data_len;
-        val_p->us += delta_ns;
-        val_p->io += 1;
+        __sync_fetch_and_add(&val_p->bytes, start_p->data_len);
+        __sync_fetch_and_add(&val_p->us, delta_ns);
+        __sync_fetch_and_add(&val_p->io, 1);
     } else {
         struct value_t tmp_v = { };
         __builtin_memset(&tmp_v, 0, sizeof(tmp_v));

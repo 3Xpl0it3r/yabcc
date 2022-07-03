@@ -15,8 +15,9 @@ extern "C"
 #include <sstream>
 
 
-CacheState::CacheState()
+CacheStateController::CacheStateController(struct cachestate_option_t opt)
 {
+    _opt = opt;
     // load bpf
     this->_skel = skel_cachestat__open();
     skel_cachestat__load(this->_skel);
@@ -40,7 +41,7 @@ vector<string>split(const string &s, char delim)
     return elems;
 }
 
-void CacheState::Run()
+void CacheStateController::Run()
 {
     printf("%8s %8s %8s %8s %12s %10s\n", "HITS", "MISSES", "DIRTIES",
 		"HITRATIO", "BUFFERS_MB", "CACHED_MB");
@@ -77,7 +78,7 @@ void CacheState::Run()
     }
 }
 
-int CacheState::get_mem_info(unsigned long long *buffers, unsigned long long *cached)
+int CacheStateController::get_mem_info(unsigned long long *buffers, unsigned long long *cached)
 {
     string line;
     FILE *fp = fopen("/proc/meminfo", "r");
@@ -92,8 +93,9 @@ int CacheState::get_mem_info(unsigned long long *buffers, unsigned long long *ca
 }
 
 
-CacheState::~CacheState()
+CacheStateController::~CacheStateController()
 {
+    close(_map_fd);
     skel_cachestat__detach(_skel);
     skel_cachestat__destroy(_skel);
 }

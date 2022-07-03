@@ -1,14 +1,14 @@
 #ifndef __BCC_USERSPACE_H
 #define __BCC_USERSPACE_H
 
+
+#include <argp.h>
+#include <bits/types/error_t.h>
 class Controller
 {
 public:
-    virtual unsigned int Run() = 0;
-    virtual void Stop() = 0;
+    virtual void Run() = 0;
 };
-
-
 
 
 #endif
