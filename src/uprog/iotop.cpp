@@ -76,7 +76,7 @@ IotopController::IotopController(struct iotop_options_t opt)
             struct value_t v2 = (struct value_t) get<1>(item2);
             return v1.io > v2.io;
         };
-    } else if (strcmp(_opt.sort_field, "byte")) {
+    } else if (strcmp(_opt.sort_field, "byte") == 0) {
         _compare = [](_Item item1, _Item item2) -> bool {
             struct value_t v1 = (struct value_t) get<1>(item1);
             struct value_t v2 = (struct value_t) get<1>(item2);
