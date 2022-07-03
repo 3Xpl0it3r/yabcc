@@ -1,6 +1,8 @@
 # yabcc
 rewrite bcc/tools with libbpf  to support co-re
 
+- [x] biotop
+- [x] cachestat
 - [] argdist
 - [] bashreadline
 - [] bindsnoop
@@ -8,12 +10,10 @@ rewrite bcc/tools with libbpf  to support co-re
 - [] biolatpcts
 - [] biopattern
 - [] biosnoop
-- [x] biotop
 - [] bitesize
 - [] bpflist
 - [] btrfsdist
 - [] btrfsslower
-- [x] cachestat
 - [] cachetop
 - [] capable
 - [] compactsnoop
